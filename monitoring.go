@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,6 +16,7 @@ const delayOfMonitoring = 10
 
 func main(){
 	introduction()
+	registerLog("site-falso", false)
 
 	for {
 		menuOptions()
@@ -26,6 +28,7 @@ func main(){
 			initialMonitoring()
 		case 2:
 			fmt.Println("View logs...")
+		
 		case 0:
 			fmt.Println("Exiting program...")
 			os.Exit(0)
@@ -82,11 +85,12 @@ func verifyWebSite(website string){
 
 	if response.StatusCode == 200 {
 		fmt.Println("Website" , website, "loaded successfully")
+		registerLog(website, true)
 	}else{
 		fmt.Println("Website", website, "having problems", response.StatusCode)
+		registerLog(website, false)
 	}
 }
-
 
 
 func getWebSitesFile() []string{
@@ -110,5 +114,19 @@ func getWebSitesFile() []string{
 
 	file.Close()
 	return sites
+}
+
+
+func registerLog(website string, status bool) {
+	file, err := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if err != nil{
+		fmt.Println("Error when register log", err)
+	}
+
+	file.WriteString(website + "- online:" + strconv.FormatBool(status) + "\n")
+
+	file.Close()
+
 }
 
