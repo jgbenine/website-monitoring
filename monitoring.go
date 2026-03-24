@@ -124,8 +124,7 @@ func registerLog(website string, status bool) {
 		fmt.Println("Error when register log", err)
 	}
 
-	file.WriteString(website + "- online:" + strconv.FormatBool(status) + "\n")
-
+	file.WriteString(time.Now().Format("02/01/2006 15:04:05")+ " - " + website + "- online:" + strconv.FormatBool(status) + "\n")
 	file.Close()
 
 }
