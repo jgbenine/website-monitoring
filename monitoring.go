@@ -1,20 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
 const numberOfMonitoring = 2
-const delayOfMonitoring = 5
+const delayOfMonitoring = 10
 
 func main(){
 	introduction()
 
 	for {
-
 		menuOptions()
 	
 		optionDefined := optionsSet()
@@ -58,14 +60,10 @@ func optionsSet() int{
 func initialMonitoring(){
 	fmt.Println("Monitoring...")
 
-	websites := []string{
-		"https://www.google.com/",
-		"https://www.microsoft.com/",
-		"https://vercel.com",
-		"https://github.com/"}
+	websites := getWebSitesFile()
 
 
-	for i :=0; i < numberOfMonitoring; i++{
+	for i:= 0; i < numberOfMonitoring; i++{
 		for i, website:= range	websites {
 			fmt.Println("Testing website", i, ":", website)
 			verifyWebSite(website)	
@@ -76,8 +74,12 @@ func initialMonitoring(){
 
 
 func verifyWebSite(website string){
-	response, _ := http.Get(website)
-	// fmt.Println(response)
+	response, err := http.Get(website)
+
+	if err != nil{
+		fmt.Println("Error detected in verify website:", err)
+	}
+
 	if response.StatusCode == 200 {
 		fmt.Println("Website" , website, "loaded successfully")
 	}else{
@@ -85,4 +87,28 @@ func verifyWebSite(website string){
 	}
 }
 
+
+
+func getWebSitesFile() []string{
+	var sites []string
+
+	file, err := os.Open("websites.txt")
+
+	if err != nil {
+		fmt.Println("Error detected in getWebSitesFile:" , err)
+	}
+	
+	reader := bufio.NewReader(file)
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF{
+			break
+		}
+		line = strings.TrimSpace(line)
+		sites = append(sites, line)
+	}	
+
+	file.Close()
+	return sites
+}
 
