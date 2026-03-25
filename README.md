@@ -1,73 +1,104 @@
-# Website Monitoring (Go) — Em desenvolvimento
+# Website Monitoring (Go) — In development
 
-Projeto simples em Go para **monitorar a disponibilidade de sites** via linha de comando, fazendo requisições HTTP e avaliando o `StatusCode` retornado.
+Simple Go project to **monitor website availability** from the command line by making HTTP requests and checking the returned `StatusCode`.
 
-## O que esse programa faz
+## What this program does
 
-- Exibe um menu no terminal:
-  - `1` inicia o monitoramento
-  - `2` (placeholder) ver logs
-  - `0` encerra o programa
-- Quando o monitoramento inicia, o programa:
-  - percorre uma lista de URLs (hardcoded no código)
-  - faz `GET` em cada URL
-  - imprime no terminal se o site respondeu com `200` (OK) ou se houve problema (outro status)
-  - repete o ciclo `numberOfMonitoring` vezes, aguardando `delayOfMonitoring` segundos entre os ciclos
+- Shows a terminal menu:
+  - `1` starts monitoring
+  - `2` (placeholder) view logs
+  - `0` exits the program
+- When monitoring starts, the program:
+  - reads a list of URLs from `websites.txt` (one URL per line)
+  - performs a `GET` request to each URL
+  - prints whether the website responded with `200` (OK) or had an issue (any other status)
+  - repeats the cycle `numberOfMonitoring` times, waiting `delayOfMonitoring` seconds between cycles
 
-## Estrutura do projeto
+## Project structure
 
-- `monitoring.go`: código do CLI e lógica de monitoramento.
+- `monitoring.go`: CLI code and monitoring logic.
+- `websites.txt`: list of websites to monitor (one URL per line).
 
-## Requisitos
+## Requirements
 
-- Go instalado (recomendado `>= 1.18`)
-- Acesso à internet para testar as URLs
+- Go installed (recommended `>= 1.18`)
+- Internet access to test the URLs
 
-## (Opcional) Usar `go.mod`
+## (Optional) Using `go.mod`
 
-Hoje o projeto roda com um único arquivo (`monitoring.go`). Se você quiser transformar em um módulo Go (facilita `go run .` e organização do projeto), você pode iniciar assim:
+Today the project runs as a single file (`monitoring.go`). If you want to turn it into a Go module (makes `go run .` easier and helps organize the project), you can start with:
 
 ```bash
 go mod init website-monitoring
 ```
 
-## Como executar
+## How to run
 
-Na raiz do projeto:
+From the project root:
 
 ```bash
 go run monitoring.go
 ```
 
-Depois, escolha uma opção no menu (por exemplo, `1` para iniciar o monitoramento).
+If you initialized the module with `go mod init`, you can also run:
 
-## Como compilar (build)
+```bash
+go run .
+```
+
+Then choose an option in the menu (for example, `1` to start monitoring).
+
+## How to configure websites
+
+Edit `websites.txt` and add **one URL per line**:
+
+```txt
+https://www.google.com/
+https://vercel.com
+https://github.com/
+```
+
+Notes:
+
+- Empty lines and extra whitespace are ignored.
+- A trailing newline at the end of the file should not create an “empty website”.
+
+## How to build
 
 ```bash
 go build -o website-monitoring monitoring.go
 ./website-monitoring
 ```
 
-## Como personalizar
+## How to customize
 
-Edite `monitoring.go`:
+Edit `monitoring.go`:
 
-- Quantidade de ciclos:
+- Number of cycles:
   - `const numberOfMonitoring = 2`
-- Intervalo entre ciclos (em segundos):
+- Delay between cycles (in seconds):
   - `const delayOfMonitoring = 5`
-- Lista de sites:
-  - slice `websites := []string{ ... }` dentro de `initialMonitoring()`
+- Website list:
+  - `websites.txt`
 
-## Observações e limitações atuais
+## Current notes and limitations
 
-- A opção **“View logs” (2)** ainda não está implementada (apenas imprime uma mensagem).
-- O código atualmente ignora o erro de `http.Get` (uso de `_`), então falhas de rede/DNS podem não ser reportadas da melhor forma.
-- Não há timeout explícito para as requisições HTTP (pode ficar aguardando dependendo do ambiente).
+- The **“View logs” (2)** option is not implemented yet (it only prints a message).
+- There is no explicit timeout for HTTP requests (it may hang depending on the environment).
 
-## Ideias de evolução
+## Note about `io/ioutil` (deprecated)
 
-- Registrar logs em arquivo (e ler/mostrar na opção `2`)
-- Ler a lista de URLs de um arquivo (ex.: `sites.txt`) ou via flags (`-site`, `-delay`, `-cycles`)
-- Adicionar `http.Client` com timeout
-- Fazer monitoramento concorrente (goroutines) e consolidar resultados
+If you're following an older tutorial, the `io/ioutil` package was deprecated and its functions were moved to `io`/`os`. Common equivalents:
+
+- `ioutil.ReadFile` → `os.ReadFile`
+- `ioutil.WriteFile` → `os.WriteFile`
+- `ioutil.ReadAll` → `io.ReadAll`
+- `ioutil.TempDir` → `os.MkdirTemp`
+- `ioutil.TempFile` → `os.CreateTemp`
+
+## Ideas for improvements
+
+- Write logs to a file (and read/show them in option `2`)
+- Allow configuring the URL file and parameters via flags (`-file`, `-delay`, `-cycles`)
+- Add `http.Client` with a timeout
+- Run checks concurrently (goroutines) and consolidate results
