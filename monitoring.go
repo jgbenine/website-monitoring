@@ -16,11 +16,9 @@ const delayOfMonitoring = 10
 
 func main(){
 	introduction()
-	registerLog("site-falso", false)
 
 	for {
 		menuOptions()
-	
 		optionDefined := optionsSet()
 	
 		switch optionDefined {
@@ -28,7 +26,7 @@ func main(){
 			initialMonitoring()
 		case 2:
 			fmt.Println("View logs...")
-		
+			viewLogs()
 		case 0:
 			fmt.Println("Exiting program...")
 			os.Exit(0)
@@ -127,5 +125,16 @@ func registerLog(website string, status bool) {
 	file.WriteString(time.Now().Format("02/01/2006 15:04:05")+ " - " + website + "- online:" + strconv.FormatBool(status) + "\n")
 	file.Close()
 
+}
+
+
+func viewLogs(){
+	file, err := os.ReadFile("log.txt")
+
+	if err != nil{
+		fmt.Println("Error when view logs", err)
+	}
+
+	fmt.Println(string(file))
 }
 
